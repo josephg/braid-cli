@@ -1,9 +1,9 @@
+#!/usr/bin/env node
 const EventSource = require('eventsource')
 const {inspect} = require('util')
 const chalk = require('chalk')
 
 const url = process.argv[2] || 'http://localhost:4040/raw/posts/bar'
-const es = new EventSource(url)
 
 let verbose = true // TODO: Set me with command line flags
 let streamHeaders = {}
@@ -26,6 +26,8 @@ const merge = (patchType, patch) => {
     }
   }
 }
+
+const es = new EventSource(url)
 
 es.onmessage = e => {
   const message = JSON.parse(e.data)
@@ -64,12 +66,13 @@ es.onmessage = e => {
     console.log()
 
     if (patchType !== 'full-snapshot') {
+      console.log(`${chalk.cyan('last update received at')}:`, new Date().toLocaleTimeString())
       console.log(
-        `${chalk.cyan('last change')}:`,
+        `${chalk.cyan('last update')}:`,
         inspect(data, {compact: false, depth: null, colors: process.stdout.isTTY})
       )
-      console.log(`${chalk.cyan('at')}:`, new Date().toLocaleTimeString())
     }
   
   }
 }
+
